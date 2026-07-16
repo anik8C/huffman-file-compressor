@@ -1,221 +1,132 @@
-# Huffman File Compression & Decompression System (C++ CLI)
+# File Compressor using Huffman Coding
 
-##  Overview
+A command-line file compression and decompression utility built in **C++** using the **Huffman Coding** algorithm. The project performs **lossless compression** by generating variable-length prefix codes based on character frequencies and stores the compressed output in a custom binary format.
 
-This project is a command-line based **file compression and decompression utility** built entirely in **pure C++**. It implements the **Huffman Coding algorithm** to perform lossless data compression at the bit level.
+## Features
 
-The system is designed with a modular architecture and demonstrates concepts from:
-
-* Data Structures (Trees, Priority Queue)
-* Algorithms (Greedy Strategy – Huffman Coding)
-* Systems Programming (Binary I/O, Bit Manipulation)
-* File Format Design
-* Command Line Interface (CLI) Development
-
-This is not a toy implementation — it is a complete reversible compression engine with a custom binary file format.
+- Lossless file compression and decompression
+- Huffman Tree construction using a priority queue (min-heap)
+- Custom binary file format for compressed data
+- Bit-level encoding and decoding with manual bit packing
+- Binary file I/O using C++ streams
+- Compression statistics (original size, compressed size, compression ratio)
+- Modular and object-oriented implementation
 
 ---
 
-# Features
-
-* ✅ Lossless compression using Huffman Coding
-* ✅ Bit-level writing and reading (manual bit packing)
-* ✅ Custom binary file format
-* ✅ Safe decompression using original file size tracking
-* ✅ Command-line interface support
-* ✅ Compression statistics output
-* ✅ Modular code structure
-
----
-
-# Project Architecture
+## Project Structure
 
 ```
 File_Compressor/
 │
-├── main.cpp          (CLI logic + orchestration)
-├── huffman.hpp       (Huffman class declarations)
-├── huffman.cpp       (Tree construction + code generation)
-├── bitstream.hpp     (BitWriter class)
-├── bitstream.cpp     (Bit-level write implementation)
-├── bitreader.hpp     (BitReader class)
-├── bitreader.cpp     (Bit-level read implementation)
+├── main.cpp          # CLI entry point
+├── huffman.hpp       # Huffman class declarations
+├── huffman.cpp       # Tree construction and code generation
+├── bitstream.hpp     # BitWriter interface
+├── bitstream.cpp     # Bit-level writing
+├── bitreader.hpp     # BitReader interface
+├── bitreader.cpp     # Bit-level reading
 ```
 
 ---
 
-# How It Works
+## Working
 
-## 1️⃣ Compression Flow
+### Compression
 
-1. Read input file in binary mode
-2. Build frequency table (0–255 byte range)
-3. Construct Huffman tree using a min-heap
-4. Generate prefix-free binary codes
-5. Write custom header
-6. Encode file content bit-by-bit
-7. Pack bits into bytes and write to output file
+1. Read the input file in binary mode.
+2. Calculate the frequency of each byte.
+3. Build a Huffman Tree using a priority queue.
+4. Generate variable-length Huffman codes.
+5. Write metadata (header) to the output file.
+6. Encode file contents and write compressed bits.
 
----
+### Decompression
 
-## 2️⃣ Decompression Flow
-
-1. Read header metadata
-2. Reconstruct frequency table
-3. Rebuild Huffman tree
-4. Read encoded bitstream
-5. Traverse tree bit-by-bit
-6. Stop after original byte count is restored
+1. Read metadata from the compressed file.
+2. Reconstruct the Huffman Tree.
+3. Decode the compressed bitstream.
+4. Restore the original file.
 
 ---
 
-#  Custom File Format (.huff)
-
-The compressed file uses a structured binary layout:
+## Compressed File Format
 
 ```
-[Original File Size (int)]
-[Number of Unique Characters (int)]
-[Character (1 byte) + Frequency (int)] × N
+[Original File Size]
+[Number of Unique Characters]
+[Character + Frequency] × N
 [Encoded Bitstream]
 ```
 
-This ensures decompression is deterministic and safe.
+The stored frequency table allows the Huffman Tree to be reconstructed during decompression.
 
 ---
 
-#  Usage
+## Build
 
-## Compile
-
-```
+```bash
 g++ main.cpp huffman.cpp bitstream.cpp bitreader.cpp -o compressor
 ```
 
 ---
 
-## Compress a File
+## Usage
 
-```
+### Compress
+
+```bash
 ./compressor -c input.txt output.huff
 ```
 
----
+### Decompress
 
-## 📂 Decompress a File
-
-```
+```bash
 ./compressor -d output.huff restored.txt
 ```
 
 ---
 
-# Sample Output
+## Sample Output
 
 ```
-Original Size: 5080 bytes
-Compressed Size: 3077 bytes
-Compression Saved: 39.4 %
-Compression complete.
+Original Size   : 5080 bytes
+Compressed Size : 3077 bytes
+Compression     : 39.4%
+Compression completed successfully.
 ```
 
 ---
 
-#  Testing Integrity
+## Technologies Used
 
-To verify decompression correctness:
-
-On Windows:
-
-```
-cmd /c fc input.txt restored.txt
-```
-
-If no differences are reported → compression is lossless.
+- C++
+- STL
+- Priority Queue
+- Binary Trees
+- Binary File I/O
+- Bit Manipulation
+- Object-Oriented Programming
 
 ---
 
-# Key Concepts Demonstrated
+## Future Improvements
 
-## Huffman Coding
-
-* Greedy algorithm
-* Prefix-free codes
-* Optimal variable-length encoding
-
-## Bit-Level Manipulation
-
-* Manual bit shifting
-* Byte buffering
-* Padding handling
-
-## Binary File I/O
-
-* `std::ifstream` / `std::ofstream`
-* `read()` and `write()` operations
-* Stream position tracking using `tellp()`
-
-## CLI Argument Parsing
-
-* `argc` / `argv`
-* Mode selection (-c / -d)
-* Input validation
+- File format validation using a magic number
+- Canonical Huffman Coding
+- Corruption detection
+- Support for larger files and streaming compression
+- Multi-file or directory compression
 
 ---
 
-#  Limitations
+## Learning Outcomes
 
-* Static Huffman (not adaptive)
-* No canonical encoding optimization
-* No corruption detection (no magic number)
-* Header size may reduce efficiency for very small files
+This project strengthened my understanding of:
 
----
-
-# Possible Future Enhancements
-
-* Add magic number for format validation
-* Add canonical Huffman encoding
-* Implement LZ77 + Huffman hybrid (ZIP-style compression)
-* Add corruption detection
-* Add progress indicator for large files
-* Convert to cross-platform production CLI tool
-
----
-
-# Compression Behavior
-
-Compression efficiency depends on entropy:
-
-* Text files → Good compression
-* Repetitive data → Very good compression
-* Random/encrypted data → Poor or negative compression
-
----
-
-# Conclusion
-
-This project demonstrates deep understanding of:
-
-* Data compression theory
-* Systems-level file handling
-* Bitwise operations
-* Algorithm implementation
-* Clean modular C++ design
-
-It serves as a strong portfolio project for systems programming and algorithm-focused roles.
-
----
-
-# Author
-
-Built as a deep systems programming project to master:
-
-* Data structures
-* Binary file formats
-* CLI tool development
-* Low-level C++ design
-
----
-
-🔥 Mastery is built one system at a time.
+- Greedy algorithms
+- Huffman Coding
+- Binary file handling
+- Bitwise operations
+- Data serialization
+- Modular software design
